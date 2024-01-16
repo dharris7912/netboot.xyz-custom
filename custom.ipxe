@@ -1,12 +1,32 @@
 #!ipxe
 ###
-### netboot.xyz-custom menu
+### dwayne harris
 ###
 
-:start
-echo Hello world!
-sleep 10
+:custom
+clear custom_choice
+menu Forescout Build Disk
+item --gap Boot BuildDisk
+item BuildDisk_kickstart ${space} 3.04 Automated Install
+item BuildDisk_install ${space} 3.04 Installer
+item BuildDisk_iso ${space} 3.04 ISO
+choose custom_choice || goto custom_exit
+echo ${cls}
+goto ${custom_choice}
 goto custom_exit
 
+:BuildDisk_iso
+sanboot --no-describe --drive 0x80 http://pxesvr01.qap.forescout.com:8080/ISO/forescout-dell-build-v3.04.iso
+boot || goto custom_exit
+
+:BuildDisk_install
+kernel http://pxesvr01.qap.forescout.com:8080/ISO/.....mboot.c32 -c http://pxesvr01.qap.forescout.com:8080/ISO/.......boot-70.cfg
+boot || goto custom_exit
+
+:BuildDisk_kickstart
+kernel http://pxesvr01.qap.forescout.com:8080/ISO/.....mboot.c32 -c http://pxesvr01.qap.forescout.com:8080/ISO/......boot-70-ks.cfg
+boot || goto custom_exit
+
 :custom_exit
-exit 0
+echo Boot failed. Returning to menu
+clear menu
